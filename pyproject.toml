@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "ezymart-by-evoq"
+version = "0.1.0"
+description = ""
+authors = ["Tigran Saatchyan <mr.saatchyan@gmail.com>"]
+readme = "README.md"
+packages = [{include = "ezymart_by_evoq"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
