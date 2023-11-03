@@ -9,14 +9,19 @@ packages = [{include = "ezymart_by_evoq"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = {extras = ["all"], version = "^0.104.1"}
-tortoise-orm = {extras = ["psycopg"], version = "^0.20.0"}
 aerich = "^0.7.2"
+tortoise-orm = {extras = ["asyncpg"], version = "^0.20.0"}
 
 
 [tool.poetry.group.develop.dependencies]
 flake8 = "^6.1.0"
 flake8-fastapi = "^0.7.0"
 
+
+[tool.aerich]
+tortoise_orm = "ezymart_by_evoq.config.TORTOISE_ORM"
+location = "./migrations"
+src_folder = "./."
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
