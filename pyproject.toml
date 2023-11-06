@@ -16,12 +16,15 @@ tortoise-orm = {extras = ["asyncpg"], version = "^0.20.0"}
 [tool.poetry.group.develop.dependencies]
 flake8 = "^6.1.0"
 flake8-fastapi = "^0.7.0"
+pytest = "^7.4.3"
 
 
 [tool.aerich]
-tortoise_orm = "ezymart_by_evoq.config.TORTOISE_ORM"
+tortoise_orm = "ezymart_by_evoq.core.config.TORTOISE_ORM"
 location = "./migrations"
 src_folder = "./."
+
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
