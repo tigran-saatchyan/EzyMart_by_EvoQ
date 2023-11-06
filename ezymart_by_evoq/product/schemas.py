@@ -1,0 +1,29 @@
+from typing import Optional
+
+from pydantic import BaseModel, Field
+from tortoise.contrib.pydantic import pydantic_model_creator
+
+from ezymart_by_evoq.product.models import Product
+
+ProductRetrieveSchema = pydantic_model_creator(Product, name="Product")
+
+
+class ProductCreateSchema(BaseModel):
+    name: str = Field(..., max_length=150)
+    description: str = Field(..., max_length=255)
+    price: float = Field(..., gt=0)
+    owner_id: int = Field(..., gt=0)
+
+
+class ProductUpdateSchema(BaseModel):
+    name: str = Field(..., max_length=150)
+    description: str = Field(..., max_length=255)
+    price: float = Field(..., gt=0)
+    owner_id: int = Field(..., gt=0)
+
+
+class ProductPartialUpdateSchema(BaseModel):
+    name: Optional[str] = Field(None, max_length=150)
+    description: Optional[str] = Field(None, max_length=255)
+    price: Optional[float] = Field(None, gt=0)
+    owner_id: Optional[int] = Field(None, gt=0)
