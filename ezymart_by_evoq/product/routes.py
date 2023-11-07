@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, status, HTTPException
 
 from ezymart_by_evoq.product import schemas
@@ -9,14 +11,18 @@ products_router = APIRouter(prefix="/products", tags=["Products"])
 
 @products_router.get(
     "/",
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_404_NOT_FOUND: {},
+    },
+    response_model=List[schemas.ProductRetrieveSchema]
 )
 async def list_products() -> schemas.ProductRetrieveSchema:
     """
     Retrieve a list of products.
 
     Returns:
-        schemas.ProductRetrieveSchema: A schema representing the list of
+        ProductRetrieveSchema: A schema representing the list of
         products.
 
     Raises:
@@ -37,17 +43,17 @@ async def list_products() -> schemas.ProductRetrieveSchema:
     status_code=status.HTTP_201_CREATED
 )
 async def create(
-    product_data: schemas.ProductCreateSchema
+    product_data: schemas.ProductCreateUpdateSchema
 ) -> schemas.ProductRetrieveSchema:
     """
     Create a new product.
 
     Args:
-        product_data (schemas.ProductCreateSchema): The data for the new
+        product_data (ProductCreateUpdateSchema): The data for the new
         product.
 
     Returns:
-        schemas.ProductRetrieveSchema: A schema representing the created
+        ProductRetrieveSchema: A schema representing the created
         product.
     """
     product = await Product.create(
@@ -59,6 +65,10 @@ async def create(
 @products_router.get(
     "/{product_id}",
     status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_404_NOT_FOUND: {},
+    },
+    response_model=schemas.ProductRetrieveSchema
 )
 async def retrieve(product_id: int) -> schemas.ProductRetrieveSchema:
     """
@@ -68,18 +78,14 @@ async def retrieve(product_id: int) -> schemas.ProductRetrieveSchema:
         product_id (int): The ID of the product to retrieve.
 
     Returns:
-        schemas.ProductRetrieveSchema: A schema representing the retrieved
+        ProductRetrieveSchema: A schema representing the retrieved
         product.
 
     Raises:
         HTTPException: If the product is not found, a 404 error is raised.
     """
+    await is_product_exists(product_id)
     product = await Product.filter(id=product_id).first()
-    if not product:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Product not found"
-        )
     return product
 
 
@@ -101,7 +107,7 @@ async def partial_update(
         update the product.
 
     Returns:
-        schemas.ProductPartialUpdateSchema: A schema representing the
+        ProductPartialUpdateSchema: A schema representing the
         partially updated product.
     """
     data = product_data.model_dump(exclude_unset=True)
@@ -116,7 +122,10 @@ async def partial_update(
 
 @products_router.delete(
     "/{product_id}",
-    status_code=status.HTTP_204_NO_CONTENT
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses={
+        status.HTTP_404_NOT_FOUND: {},
+    }
 )
 async def delete(product_id: int) -> None:
     """
@@ -128,10 +137,5 @@ async def delete(product_id: int) -> None:
     Raises:
         HTTPException: If the product is not found, a 404 error is raised.
     """
-    is_exists = await Product.filter(id=product_id).exists()
-    if not is_exists:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Product not found"
-        )
+    await is_product_exists(product_id)
     await Product.filter(id=product_id).delete()
